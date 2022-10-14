@@ -11,10 +11,12 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
 from rest_framework.generics import DestroyAPIView, UpdateAPIView, CreateAPIView, RetrieveAPIView, ListAPIView
+from rest_framework.permissions import IsAuthenticated
 
 from HW27.settings import TOTAL_ON_PAGE
 from ads.models.ad import Ad
 from ads.models.category import Category
+from ads.permissions.ad import IsCreatedAdminModer
 from ads.serializers.ad import AdSerializer, AdImageSerializer, AdUpdateSerializer, AdCreateSerializer
 from users.models import User
 
@@ -61,9 +63,13 @@ class AdListView(ListAPIView):
             )
         return super().get(request, *args, **kwargs)
 
+
+
+
 class AdDetailView(RetrieveAPIView):
     queryset = Ad.objects.all()
     serializer_class = AdSerializer
+    permission_classes = [IsAuthenticated]
 
 
 class AdCreateView(CreateAPIView):
@@ -73,14 +79,17 @@ class AdCreateView(CreateAPIView):
 class AdUpdateView(UpdateAPIView):
     queryset = Ad.objects.all()
     serializer_class = AdUpdateSerializer
+    permission_classes = [IsAuthenticated, IsCreatedAdminModer]
 
 
 class AdImageView(UpdateAPIView):
     queryset = Ad.objects.all()
     serializer_class = AdImageSerializer
+    permission_classes = [IsAuthenticated, IsCreatedAdminModer]
 
 
 class AdDeleteView(DestroyAPIView):
     queryset = Ad.objects.all()
     serializer_class = AdSerializer
+    permission_classes = [IsAuthenticated, IsCreatedAdminModer]
 
