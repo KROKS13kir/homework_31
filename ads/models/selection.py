@@ -5,7 +5,6 @@ from users.models import User
 
 
 class Selection(models.Model):
-
     owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=100)
     items = models.ManyToManyField(Ad)

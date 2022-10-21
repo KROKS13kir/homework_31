@@ -1,9 +1,11 @@
 from rest_framework import serializers
 
-from ads.models.location import Location
+from ads.models.category import Category
 
 
-class LocationSerializer(serializers.ModelSerializer):
+class CategorySerializer(serializers.ModelSerializer):
+    slug = serializers.SlugField(min_length=5, max_length=10)
+
     class Meta:
-        model = Location
+        model = Category
         fields = '__all__'

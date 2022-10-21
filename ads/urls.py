@@ -2,8 +2,7 @@ from django.urls import path
 from rest_framework import routers
 
 from ads.views.ad import AdListView, AdDetailView, AdUpdateView, AdImageView, AdDeleteView, AdCreateView
-from ads.views.category import CategoryListView, CategoryDetailView, CategoryUpdateView, CategoryDeleteView, \
-    CategoryCreateView
+from ads.views.category import CategoryViewSet
 from ads.views.index import index
 from ads.views.location import LocationViewSet
 from ads.views.selection import SelectionListView, SelectionDetailView, SelectionUpdateView, SelectionDeleteView, \
@@ -11,6 +10,7 @@ from ads.views.selection import SelectionListView, SelectionDetailView, Selectio
 
 router = routers.SimpleRouter()
 router.register('location', LocationViewSet)
+router.register('cat', CategoryViewSet)
 
 urlpatterns = [
     path('', index),
@@ -20,11 +20,6 @@ urlpatterns = [
     path('ad/<int:pk>/upload_image/', AdImageView.as_view()),
     path('ad/<int:pk>/delete/', AdDeleteView.as_view()),
     path('ad/create/', AdCreateView.as_view()),
-    path('cat/', CategoryListView.as_view()),
-    path('cat/<int:pk>/', CategoryDetailView.as_view()),
-    path('cat/<int:pk>/update/', CategoryUpdateView.as_view()),
-    path('cat/<int:pk>/delete/', CategoryDeleteView.as_view()),
-    path('cat/create/', CategoryCreateView.as_view()),
     path('selection/', SelectionListView.as_view()),
     path('selection/<int:pk>/', SelectionDetailView.as_view()),
     path('selection/<int:pk>/update/', SelectionUpdateView.as_view()),

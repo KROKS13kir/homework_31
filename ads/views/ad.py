@@ -1,82 +1,77 @@
-from django.core.paginator import Paginator
 from django.db.models.query_utils import Q
-from django.http.response import HttpResponse, JsonResponse
-from django.shortcuts import render, get_object_or_404
-import json
 
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
-from django.views.generic.base import View
-from django.views.generic.detail import DetailView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.views.generic.list import ListView
 from rest_framework.generics import DestroyAPIView, UpdateAPIView, CreateAPIView, RetrieveAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 
-from HW27.settings import TOTAL_ON_PAGE
 from ads.models.ad import Ad
-from ads.models.category import Category
 from ads.permissions.ad import IsCreatedAdminModer
 from ads.serializers.ad import AdSerializer, AdImageSerializer, AdUpdateSerializer, AdCreateSerializer
-from users.models import User
 
 
 class AdListView(ListAPIView):
+    """Display all ads"""
     queryset = Ad.objects.all()
     serializer_class = AdSerializer
 
     def get(self, request, *args, **kwargs):
-        categories = request.Get.getlist('cat', None)
+
+        # Filter by category id
+        categories = request.GET.getlist('cat', None)
         cat_query = None
-        for category in categories:
+
+        for cat_id in categories:
             if cat_query is None:
-                cat_query = Q(category__id__exact=category)
+                cat_query = Q(category__id__exact=cat_id)
             else:
-                cat_query |= Q(category__id__exact=category)
+                cat_query |= Q(category__id__exact=cat_id)
+
         if cat_query:
+            self.queryset = self.queryset.filter(cat_query)
+
+        # Filter by ad text
+        ad_name = request.GET.get('text', None)
+        if ad_name:
             self.queryset = self.queryset.filter(
-                cat_query
+                name__icontains=ad_name
             )
 
-        advert_name = request.GET.get('text', None)
-        if advert_name:
-            self.queryset = self.queryset.filter(
-                name__icontains=advert_name
-            )
-
+        # Filter by user location
         user_location = request.GET.get('location', None)
         if user_location:
             self.queryset = self.queryset.filter(
                 author__location__name__icontains=user_location
             )
 
+        # Filter by price
         price_from = request.GET.get('price_from', None)
-
+        price_to = request.GET.get('price_to', None)
         if price_from:
             self.queryset = self.queryset.filter(
                 price__gte=price_from
             )
-        price_to = request.GET.get('price_to', None)
         if price_to:
             self.queryset = self.queryset.filter(
                 price__lte=price_to
             )
+
         return super().get(request, *args, **kwargs)
 
 
-
-
 class AdDetailView(RetrieveAPIView):
+    """Display ad by id"""
     queryset = Ad.objects.all()
     serializer_class = AdSerializer
     permission_classes = [IsAuthenticated]
 
 
 class AdCreateView(CreateAPIView):
+    """Create new add"""
     queryset = Ad.objects.all()
     serializer_class = AdCreateSerializer
 
+
 class AdUpdateView(UpdateAPIView):
+    """Update add by id"""
     queryset = Ad.objects.all()
     serializer_class = AdUpdateSerializer
     permission_classes = [IsAuthenticated, IsCreatedAdminModer]
@@ -89,7 +84,7 @@ class AdImageView(UpdateAPIView):
 
 
 class AdDeleteView(DestroyAPIView):
+    """Delete ad by id"""
     queryset = Ad.objects.all()
     serializer_class = AdSerializer
     permission_classes = [IsAuthenticated, IsCreatedAdminModer]
-
