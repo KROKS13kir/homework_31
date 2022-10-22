@@ -8,7 +8,14 @@ from tests.factories.ad import AdFactory
 def test_ad_list(client):
     ads = AdFactory.create_batch(10)
 
+    expected_response = {
+        "count": 10,
+        "next": None,
+        "previous": None,
+        "results": AdSerializer(ads, many=True).data
+    }
+
     response = client.get("/ad/")
 
     assert response.status_code == 200
-    assert response.data == AdSerializer(ads, many=True).data
+    assert response.data == expected_response

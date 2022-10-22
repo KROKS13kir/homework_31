@@ -23,15 +23,15 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=150, null=True)
     username = models.CharField(max_length=20, unique=True)
     password = models.CharField(max_length=200)
-    role = models.CharField(choices=UserRoles.choices, default='member', max_length=13)
+    location_id = models.ForeignKey(Location, on_delete=models.CASCADE, null=True)
+    email = models.EmailField(null=True, unique=True)
+    role = models.CharField(choices=UserRoles.choices, default='member', max_length=15)
     age = models.PositiveIntegerField(
         null=True,
         blank=True,
         validators=[MinValueValidator(limit_value=9, message='Allowed age 9 and over')]
     )
     birth_date = models.DateField(null=True)
-    email = models.EmailField(unique=True, null=True)
-    location = models.ManyToManyField(Location)
 
     class Meta:
         verbose_name = 'Пользователь'
